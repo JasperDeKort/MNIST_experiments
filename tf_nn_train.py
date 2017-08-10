@@ -17,7 +17,7 @@ tf.reset_default_graph()
 n_classes = 10
 batch_size = 100
 
-log_folder = "./tf_nn_model2"
+log_folder = "./tf_nn_model"
 
 inputsize = [28, 28, 1]
 
@@ -136,7 +136,7 @@ def train_neural_network(x_train, y_train, x_test, y_test,x_img,y_img):
     print('test set size: {}'.format(len(y_test)))
     print('train set size: {}'.format(len(y_train)))
     # number of cycles of feed forward and back propagation
-    hm_epochs = 5
+    hm_epochs = 25
     saver = tf.train.Saver(keep_checkpoint_every_n_hours=0.5, )
     i = 0
     print('starting training')
@@ -169,22 +169,21 @@ def train_neural_network(x_train, y_train, x_test, y_test,x_img,y_img):
                                                                 layer_keep_holder: layer_keep})
                 epoch_loss += c
                 i += end - start
+                #generate summaries every 10000 examples
                 if start % 10000 == 0:
                     testsummary= sess.run(testmerge, feed_dict={x: x_test, y: y_test, layer_keep_holder: 1})
-                    writer.add_summary(testsummary,i)
-                    
+                    writer.add_summary(testsummary,i)                   
                     trainsummary = sess.run(trainmerge, feed_dict={x: x_train[:10000], y: y_train[:10000], layer_keep_holder: 1} )
                     writer.add_summary(trainsummary,i)
-                
-                    imagesum = sess.run(imagepassmerge,feed_dict={x: x_img})
-                    writer.add_summary(imagesum,i)
-
             summary, acc, conf = sess.run([testmerge, acc_op, conf_mat], feed_dict={x: x_test, y: y_test, layer_keep_holder: 1})
             print('Epoch ', epoch + 1, ' completed out of ', hm_epochs, ' ,epoch loss: ', epoch_loss)
             print('current accuracy on test  set {}'.format(acc))
             acctrain = sess.run(acc_op, feed_dict={x: x_train[:10000], y: y_train[:10000], layer_keep_holder: 1})
             print('current accuracy on train set {}'.format(acctrain))
             print(conf)
+            # generate images by filter pass through for filter 1 and 2
+            imagesum = sess.run(imagepassmerge,feed_dict={x: x_img})
+            writer.add_summary(imagesum,i)
             saver.save(sess, log_folder + '/v01', global_step=i)
         correct = tf.equal(tf.argmax(prediction,1), tf.argmax(y,1))
         accuracy = tf.reduce_mean(tf.cast(correct,'float'))
