@@ -82,13 +82,6 @@ with tf.name_scope("cost"):
     #cost = loss + l2beta * regularization
     optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate,epsilon=epsilon).minimize(cost)
 
-# generate images of the filters for human viewing
-with tf.variable_scope('visualization_filter1'):
-    # to tf.image_summary format [batch_size, height, width, channels]
-    kernel_transposed = tf.transpose (filter1, [3, 0, 1, 2])
-    # reshape from 2 channel filters to 1 channel filters for image gen
-    tf.summary.image('conv1/filters', kernel_transposed, max_outputs=32)
-
 #generate summaries in test name scope to collect and merge easily        
 with tf.name_scope("test"):
     with tf.name_scope("cost"):
@@ -116,6 +109,14 @@ with tf.name_scope("train"):
     with tf.name_scope("accuracy"):
         tf.summary.scalar("accuracy", acc_op)
         
+# generate images of the filters for human viewing
+with tf.variable_scope('visualization_filter1'):
+    # to tf.image_summary format [batch_size, height, width, channels]
+    kernel_transposed = tf.transpose (filter1, [3, 0, 1, 2])
+    # reshape from 2 channel filters to 1 channel filters for image gen
+    tf.summary.image('conv1/filters', kernel_transposed, max_outputs=32)
+
+# generate images from filter pass through results. 1 for each class.        
 with tf.name_scope("f1pass"):
     imageconvlist = []
     data = tf.reshape(x,[-1,28,28,1])
