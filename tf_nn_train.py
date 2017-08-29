@@ -17,7 +17,7 @@ tf.reset_default_graph()
 n_classes = 10
 batch_size = 100
 
-log_folder = "./tf_nn_model"
+log_folder = "./tf_nn_model2"
 
 inputsize = [28, 28, 1]
 
